@@ -2,5 +2,6 @@
 
 Space invaders game created with JavaScript and WebGL.
 
-Live demo: _TODO_
-Code explaination: _TODO_
+[Live demo](https://lluises.github.io/space-invaders-webgl/)
+
+[Code explaination](https://lluises.github.io/space-invaders-webgl/explaination.html)
