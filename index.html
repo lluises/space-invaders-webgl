@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Space Invaders by LluísE</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="playbutton.js"></script>
+    <script type="text/javascript" src="graphics.js"></script>
+    <script type="text/javascript" src="enemy.js"></script>
+    <script type="text/javascript" src="enemyarmy.js"></script>
+    <script type="text/javascript" src="arsenal.js"></script>
+    <script type="text/javascript" src="bullet.js"></script>
+    <script type="text/javascript" src="spaceship.js"></script>
+    <script type="text/javascript" src="models.js"></script>
+    <script type="text/javascript" src="flags.js"></script>
+    <script type="text/javascript" src="levels.js"></script>
+    <script type="text/javascript" src="game.js"></script>
+
+    <script id="myVertexShader" type="x-shader/x-vertex">#version 300 es
+     in vec2 a_position;
+
+     uniform vec2 u_resolution;
+     uniform vec2 u_translation;
+     uniform vec2 u_rotation;
+     uniform vec2 u_scale;
+
+     void main() {
+       // Scale the position
+       vec2 scaledPosition = a_position * u_scale;
+       
+       // Rotate the position
+       vec2 rotatedPosition = vec2(
+         scaledPosition.x * u_rotation.y + scaledPosition.y * u_rotation.x,
+         scaledPosition.y * u_rotation.y - scaledPosition.x * u_rotation.x);
+       
+       // Add in the translation.
+       vec2 position = rotatedPosition + u_translation;
+
+       // convert the position from pixels to 0.0 to 1.0
+       vec2 zeroToOne = position / u_resolution;
+
+       // convert from 0->1 to 0->2
+       vec2 zeroToTwo = zeroToOne * 2.0;
+
+       // convert from 0->2 to -1->+1 (clipspace)
+       vec2 clipSpace = zeroToTwo - 1.0;
+
+       gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+     }
+    </script>
+
+    <script id="myFragmentShader" type="x-shader/x-fragment">#version 300 es
+     precision mediump float;
+     out vec4 fragmentColor;
+     uniform vec4 myColor;
+
+     void main() {
+       fragmentColor = myColor;
+     }
+    </script>
+  </head>
+
+  <body>
+    <div class="infobar">
+      <div class="controls">
+        Controls: [←][↑][→] / [A][W][D]
+      </div>
+      <div class="explain">
+        <a href="explaination.html">
+          Game development explaination
+        </a>
+      </div>
+    </div>
+
+    <div class="center">
+      <div>
+        <div class="topbar">
+          <div id="time">00:00</div>
+          <div id="score">000</div>
+        </div>
+        <canvas id="myCanvas" width="720" height="720">
+          El Navegador no soporta HTML5 :(
+        </canvas>
+      </div>
+    </div>
+  </body>
+</html>

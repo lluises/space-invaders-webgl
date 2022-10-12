@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+}
+
+a {
+  color: #4466ff;
+  text-decoration: none;
+}
+
+canvas {
+  border: 1px solid rgba(255, 255,  255, .2);
+  /* height: 90vh;
+     width: 90vh; */
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 2em;
+  font-family: monospace;
+}
+
+.topbar > #time {
+  width: 50%;
+  text-align: left;
+}
+
+.topbar > #score {
+  width: 50%;
+  text-align: right;
+}
+
+.infobar {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: left;
+  color: white;
+  font-size: 1.4em;
+  font-family: monospace;
+  width: 100vw;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding: 1em;
+}
+
+.infobar > .controls {
+  padding-left: 0em;
+}
+
+.infobar > .explain {
+  padding-right: 2em;
+}

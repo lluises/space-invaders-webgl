@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Space Invaders by LluísE</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="explaination.css">
+    <script type="text/javascript" src="explaination.js"></script>
+    <script type="text/javascript" src="playbutton.js"></script>
+    <script type="text/javascript" src="graphics.js"></script>
+    <script type="text/javascript" src="enemy.js"></script>
+    <script type="text/javascript" src="enemyarmy.js"></script>
+    <script type="text/javascript" src="arsenal.js"></script>
+    <script type="text/javascript" src="bullet.js"></script>
+    <script type="text/javascript" src="spaceship.js"></script>
+    <script type="text/javascript" src="models.js"></script>
+    <script type="text/javascript" src="flags.js"></script>
+    <script type="text/javascript" src="levels.js"></script>
+    <script type="text/javascript" src="game.js"></script>
+
+    <script id="myVertexShader" type="x-shader/x-vertex">#version 300 es
+     in vec2 a_position;
+
+     uniform vec2 u_resolution;
+     uniform vec2 u_translation;
+     uniform vec2 u_rotation;
+     uniform vec2 u_scale;
+
+     void main() {
+       // Scale the position
+       vec2 scaledPosition = a_position * u_scale;
+       
+       // Rotate the position
+       vec2 rotatedPosition = vec2(
+         scaledPosition.x * u_rotation.y + scaledPosition.y * u_rotation.x,
+         scaledPosition.y * u_rotation.y - scaledPosition.x * u_rotation.x);
+       
+       // Add in the translation.
+       vec2 position = rotatedPosition + u_translation;
+
+       // convert the position from pixels to 0.0 to 1.0
+       vec2 zeroToOne = position / u_resolution;
+
+       // convert from 0->1 to 0->2
+       vec2 zeroToTwo = zeroToOne * 2.0;
+
+       // convert from 0->2 to -1->+1 (clipspace)
+       vec2 clipSpace = zeroToTwo - 1.0;
+
+       gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+     }
+    </script>
+
+    <script id="myFragmentShader" type="x-shader/x-fragment">#version 300 es
+     precision mediump float;
+     out vec4 fragmentColor;
+     uniform vec4 myColor;
+
+     void main() {
+       fragmentColor = myColor;
+     }
+    </script>
+  </head>
+
+  <body>
+    <div class="main-layout">
+      <div class="left">
+        <h1>Space Invaders in WebGL</h1>
+        <h1>By <a href="https://github.com/lluises", target="blank">LluísE</a></h1>
+        <div class="toc-title">Table of contents</div>
+        <div id="toc" class="toc"></div>
+      </div>
+
+      <div class="right">
+        <div class="center-horitzontally">
+          <div class="explain_body">
+
+            <h1>Space Invaders in WebGL</h1>
+            <h2 class="center-text">By LluísE</h2>
+
+            <div class="center-horitzontally">
+              <canvas id="banner" width="520" height="360">
+                Canvas is unsupported by your browser :v
+              </canvas>
+            </div>
+
+            <h2 class="@">About</h2>
+            <p>
+              Created by <a href="https://github.com/lluises", target="blank">LluísE</a> on October of 2022.
+            </p>
+            <p>
+              This game is made with JavaScript and WebGL. It started as a class assignement at Informàtica Gràfica (Graphic informatics), at the <a href="https://www.udg.edu/" target="blank">Universitat de Girona (UdG)</a>. The main goal was to learn the basics of WebGl, however, I got a little bit carried away, and I made completly playable game, inspired by <a href="https://en.wikipedia.org/wiki/Space_Invaders", target="blank">Space Invaders</a>.
+            </p>
+
+            <h2>Code structure</h2>
+            <p>
+              The code is structured by the <span style="font-style: italic;">Object Oriented Programming</span> paradigm. As such, there are multiple classes that form the game parts. These classes have been created with the <a href="https://www.w3schools.com/js/js_object_prototypes.asp" target="blank">prototipe way of making classes in JavaScript</a>.
+            </p>
+
+            <h3>Classes</h3>
+            <table>
+              <tr>
+                <th style="width: 10em">Class name</th>
+                <th style="width: 10em">Source file</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td class="class-name">Graphics</td>
+                <td class="source-file"><a href="graphics.js">graphics.js</a></td>
+                <td class="description">
+                  Simple API to manage WebGL calls in a canvas.
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name">Game</td>
+                <td class="source-file"><a href="game.js">game.js</a></td>
+                <td class="description">
+                  Control the game flow, game loop, input-output and the whole thing, basicly.
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name">Spaceship</td>
+                <td class="source-file"><a href="spaceship.js">spaceship.js</a></td>
+                <td class="description">
+                  Player's spaceship. It draws and moves an spaceship.
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name">Enemy</td>
+                <td class="source-file"><a href="enemy.js">enemy.js</a></td>
+                <td class="description">
+                  A single enemy, with its autonomous movements and own color.
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name">EnemyArmy</td>
+                <td class="source-file"><a href="enemyarmy.js">enemyarmy.js</a></td>
+                <td class="description">
+                  Manages all the enemies, with their the coordinated bouncing, rendering, increasing speed and killing.
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name">Bullet</td>
+                <td class="source-file"><a href="bullet.js">bullet.js</a></td>
+                <td class="description">
+                  A single bullet, it draws and moves itself, and allows checking colisions.
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name">Arsenal</td>
+                <td class="source-file"><a href="arsenal.js">arsenal.js</a></td>
+                <td class="description">
+                  Manages all the bullets, it shoots, checks colisions with the enemies, other bullets or the spaceship; decides when a bullet has killed and when it needs to be destroyed.
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name">PlayButton</td>
+                <td class="source-file"><a href="playbutton.js">playbutton.js</a></td>
+                <td class="description">
+                  It manages the play button, and the mouse clicks over it.
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name">Level</td>
+                <td class="source-file"><a href="levels.js">levels.js</a></td>
+                <td class="description">
+                  Level designs and configurations
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name">Flag</td>
+                <td class="source-file"><a href="flag.js">flag.js</a></td>
+                <td class="description">
+                  Flag colors and patters to apply to any matrix.
+                </td>
+              </tr>
+              <tr>
+                <td class="class-name"><i>MODELS</i></td>
+                <td class="source-file"><a href="models.js">models.js</a></td>
+                <td class="description">
+                  Not a real class. It holds the model's data, it calculates models such as circles and caches calculated models.
+                </td>
+              </tr>
+            </table>
+
+            <h2 class="@">Graphics</h2>
+            <p>
+              All direct WebGL calls are managed by <a href="graphics.js">graphics.js</a>. We use a single WebGL program, created at <a href="graphics.js">graphics.js</a> → init_shaders(). And we have 5 parameters we can modify for each model we render:
+            </p>
+            <h3 class="@">Transformation parameters</h3>
+            <h4 class="@">myColor</h4>
+            <p>
+              The shape color, defined as [r, g, b, a]. The parameters r, g, and b are a decimal value between 0 and 1, and so is alpha, although doesn't do much here.
+            </p>
+            <h4 class="@">u_resolution</h4>
+            <p>
+              The resolution for the model, we normaly just set it to [1.0, 1.0].
+            </p>
+            <h4 class="@">u_translation</h4>
+            <p>
+              The translation when drawing model, we specify two coordinates: [x, y], between -1 and +1.
+            </p>
+            <h4 class="@">u_rotation</h4>
+            <p>
+              The model rotation. The Graphics class expects the value in radiants, and then it transformates it to the appropiate value by calculating <i>sin(angle)</i>.
+            </p>
+            <h4 class="@">u_scale</h4>
+            <p>
+              This parameter is used, as the obvious name suggests, to scale the model, either in the x or in the y coordinates, or both of them. Furthermore, the Graphics API allows applying a constant factor to all models drawn in the canvas, to uniformly scale the whole game. Behind the scenes, it combines the model scale with the contsant factor, and passes resulting value to the shader, it also corrects the translations to keep consintency.
+            </p>
+
+            <h3 class="@">Buffers</h3>
+            <p>
+              In this project, and to keep it simple, each class instance that needs drawing, generates a WebGL buffer for itself. As an example, Enemy generates a buffer for each instance of an enemy. Considering how all enemy models are the same, we could have optimized this part by sharing the buffer between all enemies, work for the future i guess ‾\_(ツ)_/‾. All buffers are created through <a href="graphics.js">graphics.js</a> → create_buffer(model), by passing an object with vertices: <i>{vertices: [...]}</i>, and since we pass the object as a reference to create_buffer, the method will add <i>idBufferVertices</i> to the object to control which buffer is using.
+            </p>
+
+            <h3 class="@">Shader</h3>
+            <pre>#version 300 es
+in vec2 a_position;
+
+uniform vec2 u_resolution;
+uniform vec2 u_translation;
+uniform vec2 u_rotation;
+uniform vec2 u_scale;
+
+void main() {
+  // Scale the position
+  vec2 scaledPosition = a_position * u_scale;
+       
+  // Rotate the position
+  vec2 rotatedPosition = vec2(
+    scaledPosition.x * u_rotation.y + scaledPosition.y * u_rotation.x,
+    scaledPosition.y * u_rotation.y - scaledPosition.x * u_rotation.x);
+  
+  // Add in the translation.
+  vec2 position = rotatedPosition + u_translation;
+
+  // convert the position from pixels to 0.0 to 1.0
+  vec2 zeroToOne = position / u_resolution;
+
+  // convert from 0->1 to 0->2
+  vec2 zeroToTwo = zeroToOne * 2.0;
+
+  // convert from 0->2 to -1->+1 (clipspace)
+  vec2 clipSpace = zeroToTwo - 1.0;
+
+  gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+}
+            </pre>
+            <p>
+              This shader allows us to do translations, rotations and scalings easly, and through the GPU.
+              Moreover, we can use it to define each triangle, from our models, by issuing three points: [x, y, x2, y2, x3, y3].
+            </p>
+            <p>
+              The shader is heavly inspired in this example from webgl2fundamentals:
+              <a href="https://webgl2fundamentals.org/webgl/lessons/webgl-2d-scale.html">
+                WebGL2 2D Scale from webgl2fundamentals.org
+              </a>
+            </p>
+
+            <h4 class="@">Fragment shader</h5>
+            <pre>#version 300 es
+precision mediump float;
+out vec4 fragmentColor;
+uniform vec4 myColor;
+
+void main() {
+  fragmentColor = myColor;
+}
+            </pre>
+            <p>
+              The fragment shader is preatty simple, it just allows us to change the color per model.
+            </p>
+
+            <h2 class="@">Models</h2>
+            <p>
+              All models are created by triangles defined by three points (x, y).
+            </p>
+            <p>
+              You can easly check all the shapes used in this project, by inspecting the source code at <a href="models.js">models.js</a>. The code also contains a simple caching mecanisme to avoid recalculating the same shape, such as when automaticly generating a circle.
+            </p>
+
+            <h3 class="@">Enemy model</h3>
+            <div class="center-horitzontally">
+              <img src="img/enemy1.png" />
+            </div>
+            <p>
+              Since WebGL requires all shapes to be drawn as triangles, I had to find a way to cut the enemy model in a group of triangles. This is the structure I designed, and it worked fine.
+            </p>
+            <h4 class="@">Rendered lines</h4>
+            <div class="side-by-side">
+              <canvas id="enemy-full" width="400" height="400">
+                Canvas is unsupported by your browser :v
+              </canvas>
+              <canvas id="enemy-lines" width="400" height="400">
+                Canvas is unsupported by your browser :v
+              </canvas>
+            </div>
+            <h4 class="@">Animation</h4>
+            <div class="center-horitzontally">
+              <canvas id="enemy-strip" width="600" height="60">
+                Canvas is unsupported by your browser :v
+              </canvas>
+            </div>
+            <p>
+              The die animation is a mixing of the shader parameters. First, it changes the color to white and fades to black, and secondly, it shrinks by progressively reducing the scale.
+            </p>
+
+            <h3 class="@">Spaceship model 1</h3>
+            <div class="center-horitzontally">
+              <img src="img/spaceship1.png" />
+            </div>
+            <p>
+              This spaceship model is based on the original Space Invaders videogame. While the code for the model is still there and can be easly activated, it has been deprecated in favor of Spaceship model 2.
+            </p>
+
+            <h3 class="@">Spaceship model 2</h3>
+            <div class="center-horitzontally">
+              <img src="img/spaceship2.png" />
+            </div>
+            <p>
+              To complete the spaceship decoration, the base (green triangles at the image above) has been duplicated with appropiate scaling to generate the ilusion of borders. Furthermore, two circles have been added to the wings, those have been created through <a href="models.js">models.js</a> → MODELS → Circle(6)
+            </p>
+
+            <h4 class="@">Rendered lines</h4>
+            <div class="side-by-side">
+              <canvas id="spaceship-full" width="400" height="400">
+                Canvas is unsupported by your browser :v
+              </canvas>
+              <canvas id="spaceship-lines" width="400" height="400">
+                Canvas is unsupported by your browser :v
+              </canvas>
+            </div>
+
+            <h3 class="@">Bullet</h3>
+            <h4 class="@">Rendered lines</h4>
+            <div class="side-by-side">
+              <canvas id="bullet-full" width="200" height="200">
+                Canvas is unsupported by your browser :v
+              </canvas>
+              <canvas id="bullet-lines" width="200" height="200">
+                Canvas is unsupported by your browser :v
+              </canvas>
+            </div>
+            <p>
+              Bullets are ovals created throuhg <a href="models.js">models.js</a> → MODELS → Oval(resolution, rx, ry) with the call <i>MODELS.Oval(12, 1, 2)</i>. Since bullets are small, we don't need a lot of resolution when drawing the circle, thats why we only use 12 sides.
+            </p>
+            <p>
+              To calculate an oval, I used the same formula as a circle, but I applied a deformation by multiplying the <i>x</i>, <i>y</i> coordinates with the <i>ry</i> and <i>rx</i> parameters of the function Oval:
+            </p>
+            <pre>// {i} is the current iteration step
+angle = 2 * Math.PI * i / resolution;
+x = Math.cos(angle)/ry;
+y = Math.sin(angle)/rx;</pre>
+
+            <h3 class="@">Play button</h3>
+            <div class="side-by-side">
+              <canvas id="playbutton-full" width="400" height="400">
+                Canvas is unsupported by your browser :v
+              </canvas>
+              <canvas id="playbutton-lines" width="400" height="400">
+                Canvas is unsupported by your browser :v
+              </canvas>
+            </div>
+            <p>
+              The play button is created with two circles, the outermost is drawn first, and then the innermost gets drawn on top. Finally, we just draw a simple triangle to simbolize a play button.
+            </p>
+            <p>
+              In order to retrieve the click event, The <a href="playbutton.js">PlayButton</a> instance will listen to click events on the canvas. When a click gets detected, it will calculate the canvas offset, and will transformate the cursor position to the relative position inside the canvas, finllay, it will determinate if the click was indeed over the play button area, or not:
+              <pre>// Get canvas and mouse properties
+const box = this.gl.canvas.getBoundingClientRect();
+const real_x = event.clientX;
+const real_y = event.clientY;
+
+// Translate to ingame x and y
+const x = (real_x - box.x) / box.width;
+const y = (real_y - box.y) / box.height;
+
+// Check if we were clicked
+if (this.colision(x, y))
+  this.callback();</pre>
+            </p>
+
+            <h2 class="@">Physics</h2>
+            <p>
+              The 2D area is [-1, +1] on both dimensions. 
+            </p>
+            <p>
+              All colisions are calculated as rectangles to simplify the logic inside <a href="bullet.js">bullet.js</a>:
+              <pre>colision(obj) {
+  return !(
+    ((this.y + this.size_y) < (obj.y)) ||
+      (this.y > (obj.y + obj.size_y)) ||
+      ((this.x + this.size_x) < obj.x) ||
+      (this.x > (obj.x + obj.size_x))
+  );
+},</pre>
+            </p>
+
+            <h2 class="@">Game engine</h2>
+            <p>
+              Besides the previous pices, the game engine uses two loops to control all the events:
+            </p>
+            <p>
+              <ol>
+                <li><a href="game.js">game.tick()</a></li>
+                <li><a href="game.js">game.draw_loop()</a></li>
+              </ol>
+            </p>
+            <p>
+              Tick is where all the calculations are done. It calls the tick methods of other classes and lets them perform one move in time, such as when an enemy moves right. In this step, it also calculates all phyisics interactions, such as colisions.
+            </p>
+            <p>
+              The draw loop, which recursively uses <i>requestFrameAnimation</i>, its where the rendering takes place. It iteratively calls all <i>render()</i> methods of other classes, such as bullets, and draws them on the canvas.
+            </p>
+
+            <h2 class="@">License</h2>
+            <p>
+              The MIT License (MIT)
+              <br>
+              Copyright © 2022 Luis Escaño Márquez.
+            </p>
+
+            <p>
+              Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+            </p>
+
+            <p>
+              The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+            </p>
+
+            <p>
+              THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

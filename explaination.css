@@ -1,0 +1,187 @@
+body {
+  color: black;
+  background-color: white;
+}
+
+canvas {
+  border-radius: 15px;
+}
+
+img {
+  border: 1px solid rgba(0, 0,  0, .6);
+  border-radius: 15px;
+  height: 50vh;
+}
+
+h1 {
+  text-align: center;
+}
+
+h2 {
+  padding-top: .5em;
+}
+
+h3 {
+  padding-top: .3em;
+}
+
+h4 {
+  padding-top: .3em;
+}
+
+p {
+  text-align: justify;
+  line-height: 1.5;
+}
+
+a {
+  color: #4466ff;
+  text-decoration: none;
+}
+
+@media only screen and (min-width: 1200px) {
+  .main-layout {
+    display: flex;
+    justify-content: right;
+  }
+
+  .main-layout > .left {
+    position: fixed;
+    top: 0;
+    left: 0;
+    justify-content: left;
+    width: 20em;
+    padding: 1em;
+    height: 100vh;
+    overflow-y: scroll;
+    background-color: #b3eafc;
+    box-shadow: 0px 0px 10px #666;
+  }
+  
+  .main-layout > .right {
+    width: 100vw;
+    min-width: 20em;
+    margin-left: 24em;
+    padding-right: 2em;
+  }
+}
+
+@media only screen and (min-width 1px) and (max-width: 1200px) {
+  .main-layout {
+    display: flex;
+    justify-content: right;
+    flex-direction: column;
+  }
+
+  .main-layout > left {
+    justify-content: left;
+    width: 80vw;
+    padding: 2em;
+    background-color: red;
+  }
+
+  .main-layout > .right {
+    width: 100vw;
+  }
+}
+
+.toc {
+  display: flex;
+  flex-direction: column;
+}
+
+.toc > div {
+  display: flex;
+  padding: .3em;
+}
+
+.toc-title {
+  font-weight: bold;
+  font-size: 1.5em;
+  text-align: center;
+  padding-bottom: .8em;
+}
+
+.toc-entry {
+  color: #000;
+  display: box;
+}
+
+.toc-entry-number {
+  text-align: right;
+  width: 3em;
+}
+
+.toc-entry-1 {
+  padding-left: 0em;
+}
+
+.toc-entry-2 {
+  padding-left: 1em;
+}
+
+.toc-entry-3 {
+  padding-left: 2em;
+}
+
+.toc-entry-4 {
+  padding-left: 3em;
+}
+
+.center-horitzontally {
+  display: flex;
+  justify-content: center;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.explain_body {
+  width: 70vw;
+  max-width: 1000px;
+}
+
+.side-by-side {
+  display: flex;
+  justify-content: center;
+}
+
+.side-by-side > div {
+  
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  background-color: #b3eafc;
+}
+
+td, th {
+  text-align: center;
+  border: none;
+  padding: .8em;
+}
+
+tr {
+  background-color: #b3eafc66;
+}
+
+tr:nth-child(even) {
+  background-color: #fff;
+}
+
+td.class-name {
+  text-align: center;
+}
+
+td.source-file {
+  text-align: center;
+}
+
+td.description {
+  text-align: justify;
+}
